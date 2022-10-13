@@ -12,9 +12,9 @@ uint32_t COUNT_JS = 0;
 uint32_t COUNT_UNIX = 0;
 uint32_t COUNT_macOS = 0;
 
-std::list<std::string> dict_JS = { "<script>evil_script()</script>" };
-std::list<std::string> dict_UNIX = { "rm -rf ~/Documents" };
-std::list<std::string> dict_macOS = { "system(\"launchctl load /Library/LaunchAgents/com.malware.agent\")"};
+std::list<std::string> dict_JS = {"<script>evil_script()</script>"};
+std::list<std::string> dict_UNIX = {"rm -rf ~/Documents"};
+std::list<std::string> dict_macOS = {"system(\"launchctl load /Library/LaunchAgents/com.malware.agent\")"};
 
 void GetRequest(const int argc,
                 const char **argv,
@@ -37,6 +37,10 @@ void ScanDirectory(std::string &path_string,
 
   for (const auto &entry : fs::directory_iterator(dir_path)) {
     std::string current_file = static_cast<std::string>(entry.path());
+    if (fs::is_directory(entry)) {
+      ScanDirectory(current_file, checker_JS, checker_UNIX, checker_macOS);
+      continue;
+    }
     std::ifstream in(current_file);
     if (in.fail())
       ++COUNT_ERROR;
